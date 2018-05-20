@@ -1,0 +1,38 @@
+doctype html
+html(lang='en')
+  head
+    title Nebulas Wallet
+    meta(charset='utf-8')
+    meta(name='viewport' content='width=device-width, initial-scale=1')
+    meta(name='description' content='User Friendly Nebulas Wallet. The easiest way to start using Nebulas.')
+    
+    meta(name="twitter:card" content="summary")
+    meta(name="twitter:site" content="@NASWallet")
+    meta(name="twitter:title" content="Nebulas Wallet")
+    meta(name="twitter:description" content="User Friendly Nebulas Wallet. The easiest way to start using Nebulas.")
+    meta(name="twitter:creator" content="@NASWallet")
+    meta(name="twitter:image" content="https://nebulaswallet.app/img/twitter.png")
+    
+    link(rel='stylesheet' href='https://fonts.googleapis.com/css?family=Work+Sans:200,400')
+    link(rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.1/css/bulma.min.css')
+    link(rel='stylesheet' href='css/style.min.css')
+    
+    script(src='https://use.fontawesome.com/releases/v5.0.13/js/all.js' integrity='sha384-xymdQtn1n3lH2wcu0qhcdaOpQwyoarkgLVxC/wZ5q7h9gHtxICrpcaSUfygqZGOe' crossorigin='anonymous' defer)
+    script(src='js/three.min.js')
+    script(src='js/util.min.js')
+    script(src='js/stars.min.js' defer)
+    
+    script(src='https://www.googletagmanager.com/gtag/js?id=UA-119521002-1' async)
+    script.
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'UA-119521002-1');
+  
+  body
+    include /pug/space.pug
+    include /pug/hero.pug  
+    include /pug/features.pug
+    include /pug/cta.pug
+    include /pug/foot.pug
+    

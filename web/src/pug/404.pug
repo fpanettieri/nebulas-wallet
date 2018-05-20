@@ -1,0 +1,34 @@
+doctype html
+html(lang='en')
+  head
+    title Page Not Found
+    meta(charset='utf-8')
+    meta(name='viewport' content='width=device-width, initial-scale=1')
+    meta(name='description' content='User Friendly Nebulas Wallet. The easiest way to start using Nebulas.')
+    
+    link(rel='stylesheet' href='https://fonts.googleapis.com/css?family=Work+Sans:200,400')
+    link(rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.1/css/bulma.min.css')
+    link(rel='stylesheet' href='css/style.min.css')
+    
+    script(src='js/three.min.js')
+    script(src='js/util.min.js')
+    script(src='js/stars.min.js' defer)
+    
+    script(src='https://www.googletagmanager.com/gtag/js?id=UA-119521002-1' async)
+    script.
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'UA-119521002-1');
+  
+  body
+    include /pug/space.pug
+    section.hero.is-fullheight
+      .hero-body
+        .container.has-text-centered
+          a(href="https://nebulaswallet.app")
+            img.hero-logo(src="img/logo.svg" alt="Nebulas Wallet Logo")
+            h1.title.is-1 404 Error
+            h2.subtitle Sorry, but the page you were trying to view does not exist.
+            p.has-text-white Click here to go back.
+    
