@@ -1,3 +1,6 @@
-web/dist
-web/src/css/style.css
+api/.envrc
+api/node_modules
+extension/tmp
 extension/dist
+web/tmp
+web/dist

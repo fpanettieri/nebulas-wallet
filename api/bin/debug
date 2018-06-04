@@ -1,0 +1,1 @@
+clear && aws logs filter-log-events --log-group-name=/aws/lambda/nebulas-wallet-api --region us-west-2

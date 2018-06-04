@@ -1,0 +1,11 @@
+{
+  "lambda": {
+    "role": "nebulas-wallet-api-executor",
+    "name": "nebulas-wallet-api",
+    "region": "us-west-2"
+  },
+  "api": {
+    "id": "sa2swb8290",
+    "module": "api"
+  }
+}

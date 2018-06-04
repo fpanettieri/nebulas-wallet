@@ -1,0 +1,11 @@
+{
+  "name": "nebulas-wallet-api",
+  "version": "1.0.0",
+  "description": "Nebulas Wallet API",
+  "author": "Fabio Panettieri",
+  "private": true,
+  "dependencies": {
+    "aws-sdk": "^2.250.1",
+    "claudia-api-builder": "^4.0.2"
+  }
+}

@@ -1,0 +1,1 @@
+aws logs delete-log-group --log-group-name=/aws/lambda/nebulas-wallet-api --region us-west-2
