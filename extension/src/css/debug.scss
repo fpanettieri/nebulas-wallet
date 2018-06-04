@@ -1,0 +1,9 @@
+@if $debug == true {
+  .view {
+    background-color: #0f0;
+    border-bottom: 1px solid #f00;
+    .head { background-color: #ff0; }
+    .body { background-color: #f0f; }
+    .foot { background-color: #0ff; }
+  }
+}

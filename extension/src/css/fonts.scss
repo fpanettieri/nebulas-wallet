@@ -1,0 +1,39 @@
+@font-face {
+  font-family: 'Work Sans';
+  font-style: normal;
+  font-weight: 200;
+  src: local('Work Sans ExtraLight'), local('WorkSans-ExtraLight'),
+    url('/fonts/WorkSans/ExtraLight.woff2') format('woff2'),
+    url('/fonts/WorkSans/ExtraLight.woff') format('woff'),
+    url('/fonts/WorkSans/ExtraLight.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Work Sans';
+  font-style: normal;
+  font-weight: 300;
+  src: local('Work Sans'), local('WorkSans-Light'),
+    url('/fonts/WorkSans/Light.woff2') format('woff2'),
+    url('/fonts/WorkSans/Light.woff') format('woff'),
+    url('/fonts/WorkSans/Light.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Work Sans';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Work Sans'), local('WorkSans-Regular'),
+    url('/fonts/WorkSans/Regular.woff2') format('woff2'),
+    url('/fonts/WorkSans/Regular.woff') format('woff'),
+    url('/fonts/WorkSans/Regular.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Work Sans';
+  font-style: normal;
+  font-weight: 700;
+  src: local('Work Sans'), local('WorkSans-Bold'),
+    url('/fonts/WorkSans/Bold.woff2') format('woff2'),
+    url('/fonts/WorkSans/Bold.woff') format('woff'),
+    url('/fonts/WorkSans/Bold.ttf') format('truetype');
+}

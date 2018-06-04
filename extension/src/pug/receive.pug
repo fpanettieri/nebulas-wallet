@@ -1,0 +1,12 @@
+.receive.view.short-view.unselectable.hidden
+  .head
+    h1 Receive
+  
+  .body
+    input.receive-address.force-select(type='text' readonly)
+    .columns
+      .column
+        .copy-btn.btn.btn-sm.btn-cta.btn-primary Copy Address
+        .cancel-btn.btn.btn-sm.btn-cta.btn-secondary Back
+      .column
+        canvas.receive-qr

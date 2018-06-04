@@ -1,0 +1,231 @@
+html {
+  font-size: 16px;
+}
+
+body {
+  font-family: $font-primary;
+}
+
+h1 {
+  font-size: 1.3rem;
+  font-weight: $font-light;
+}
+
+p {
+  font-weight: 300;
+}
+
+input[type="password"], input[type="text"], input[type="number"] {
+  width: 100%;
+  padding: .5rem;
+  border-radius: 0.2rem;
+  outline: none;
+}
+
+.short-view {
+  width: 22rem;
+  height: 13.6rem;
+}
+
+.long-view {
+  width: 22rem;
+  height: 35.6rem;
+}
+
+.view {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  &.justified { justify-content: space-around; }
+
+  .head {
+    display: flex;
+    width: 100%;
+    justify-content: space-around;
+    align-items: center;
+    padding-top: 1rem;
+    flex-shrink: 0;
+  }
+
+  .body {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    justify-content: space-evenly;
+    padding: 0 1.6rem;
+    width: 100%;
+  }
+
+  .foot {
+    display: flex;
+    flex-shrink: 0;
+    width: 100%;
+    justify-content: space-evenly;
+    padding-bottom: 1rem;
+  }
+}
+
+.columns {
+  display: flex;
+  flex-direction: row;
+  flex-grow: 1;
+  width: 100%;
+  justify-content: space-evenly;
+
+  .column {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+  }
+}
+
+.btn {
+  cursor: pointer;
+  padding: .5rem 2rem;
+  text-align: center;
+}
+
+.btn-sm {
+  font-size: .7rem;
+  padding: .5rem 1rem;
+}
+
+.btn-cta {
+  border-radius: 2rem;
+  font-size: .9rem;
+  font-weight: $font-light;
+  transition: all .1s ease-out;
+
+  &:hover { transform: scale(1.1); }
+  &:active {
+    transform: scale(0.95);
+    transition-duration: .05s;
+  }
+}
+
+.btn-aux {
+  &:hover {
+    text-decoration: underline;
+    text-underline-position: under
+  }
+}
+
+.brand-name {
+  font-size: 1.3rem;
+  font-weight: $font-extra-light;
+  padding-left: 2rem;
+  background-repeat: no-repeat;
+  background-size: contain;
+
+  &.lg {
+    font-size: 2rem;
+    padding-left: 3rem;
+  }
+}
+
+.brand-tagline {
+  font-size: 0.95rem;
+  font-weight: $font-extra-light;
+}
+
+.account {
+  .settings-btn {
+    padding-right: 0;
+  }
+
+  .account-balance {
+    border-radius: .5rem;
+    cursor: pointer;
+    font-weight: 300;
+    padding: 1rem 0;
+    text-align: center;
+    width: 100%;
+  }
+
+  .account-balance-nas {
+    font-size: 2rem;
+  }
+
+  .account-balance-usd {
+    font-size: 1rem;
+  }
+}
+
+.receive {
+  input.receive-address[type=text] {
+    border: none;
+    text-align: center;
+    outline: none;
+    font-size: 0.75rem;
+  }
+
+  .receive-qr {
+    width: 128px;
+    height: 128px;
+  }
+}
+
+.txs {
+  .txs-list {
+    overflow-x: hidden;
+    overflow-y: auto;
+    justify-content: flex-start;
+  }
+
+  .tx {
+    position: relative;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    margin: .5rem 0;
+    padding-left: 3.5rem;
+    background-repeat: no-repeat;
+    background-size: 2rem;
+    background-position-y: center;
+    cursor: pointer;
+
+    &:before {
+      content: "";
+      position: absolute;
+      top: -.5rem;
+      left: -1.6rem;
+      right: -1.6rem;
+      bottom: -.5rem;
+      z-index: -1;
+    }
+  }
+
+  .tx-main, .tx-details {
+    display: flex;
+    justify-content: space-between;
+    font-weight: $font-light;
+  }
+
+  .tx-main {
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .tx-details {
+    font-size: 0.7rem;
+  }
+
+  .tx-type {
+    text-transform: capitalize;
+  }
+}
+
+.notification {
+  position: absolute;
+  top: 0;
+  left: 0;
+
+  .body p {
+    font-size: 1rem;
+    font-weight: $font-extra-light;
+    text-align: center;
+  }
+}

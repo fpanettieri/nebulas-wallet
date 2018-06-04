@@ -1,0 +1,71 @@
+body {
+  background: $light-1;
+  color: $dark-2;
+  transition: all .2s ease-out;
+
+  input[type="password"], input[type="text"], input[type="number"] {
+    border: 1px solid $palette-5;
+  }
+
+  .btn-primary {
+    border: 1px solid $palette-4;
+    background-color: $palette-4;
+    color: $light-1;
+  }
+
+  .btn-secondary {
+    border: 1px solid $palette-4;
+    color: $palette-4;
+  }
+
+  .brand-name { background-image: url(/img/logo-dark.svg); }
+  .account-balance:hover { background-color: $light-2; }
+
+  .txs {
+    .tx {
+      &:hover:before { background-color: $light-2; }
+      &.tx-sent { background-image: url(/img/sent-dark.svg); }
+      &.tx-received { background-image: url(/img/received-dark.svg); }
+      &.tx-purchased { background-image: url(/img/purchased-dark.svg); }
+      &.tx-contract { background-image: url(/img/logo-dark.svg); }
+    }
+  }
+
+  .notification { background-color: $light-1; }
+}
+
+body.dark {
+  background: $palette-2;
+  color: $light-3;
+
+  ::placeholder {
+    color: $light-3;
+    opacity: 1;
+  }
+
+  input[type="password"], input[type="text"], input[type="number"] {
+    background-color: $palette-3;
+    border: 1px solid $palette-4;
+    color: $light-1;
+  }
+
+  .btn-secondary {
+    border: 1px solid $light-1;
+    color: $light-1;
+  }
+
+  .brand-name { background-image: url(/img/logo-light.svg); }
+  .account-balance:hover { background-color: $palette-3; }
+
+  .txs {
+    .tx {
+      &:hover:before { background-color: $palette-3; }
+      &.tx-sent { background-image: url(/img/sent-light.svg); }
+      &.tx-received { background-image: url(/img/received-light.svg); }
+      &.tx-purchased { background-image: url(/img/purchased-light.svg); }
+      &.tx-contract { background-image: url(/img/logo-light.svg); }
+    }
+  }
+
+  .notification { background-color: $palette-2; }
+}

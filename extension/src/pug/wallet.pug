@@ -1,0 +1,27 @@
+doctype html
+html(lang='en')
+  head
+    title Nebulas Wallet
+    meta(charset='utf-8')
+    meta(name='viewport' content='width=device-width, initial-scale=1')
+    
+    link(rel='stylesheet' href='/css/wallet.min.css')
+    
+    script(src='/js/cash.min.js')
+    script(src='/js/nebulas.min.js')
+    script(src='/js/qrcode.min.js')
+    script(src='/js/wallet.min.js' defer)
+  
+  body
+    include /pug/onboard.pug
+    include /pug/create.pug
+    include /pug/unlock.pug
+    include /pug/account.pug
+    include /pug/settings.pug
+    include /pug/send.pug
+    include /pug/receive.pug
+    include /pug/txs.pug
+    include /pug/notification.pug
+    .geb.hidden
+    //- include /pug/buy.pug
+    //- include /pug/contract.pug

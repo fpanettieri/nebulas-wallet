@@ -1,0 +1,36 @@
+{
+  "name": "Nebulas Wallet",
+  "short_name": "$NAS Wallet",
+  "version": "1.0.0",
+  "description": "User Friendly $NAS Wallet. The easiest way to start using Nebulas.",
+  "author": "https://nebulaswallet.app",
+  "permissions": ["storage"],
+  "optional_permissions": ["identity", "identity.email", "downloads"],
+
+  "background": {
+    "scripts": ["js/background.min.js"],
+    "persistent": true
+  },
+
+  "browser_action": {
+    "default_title": "Nebulas Wallet",
+    "default_popup": "html/wallet.html"
+  },
+
+  "content_scripts": [
+    {
+      "matches": [ "file://*/*", "http://*/*", "https://*/*" ],
+      "js": [ "/js/content.min.js" ],
+      "run_at": "document_start",
+      "all_frames": true
+    }
+  ],
+
+  "icons": {
+    "32": "img/icon32.png",
+    "128": "img/icon128.png"
+  },
+
+  "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",
+  "manifest_version": 2
+}
