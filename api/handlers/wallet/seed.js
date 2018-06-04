@@ -74,7 +74,7 @@ function seedWallet (wallet_rec, address, email) {
   let now = (new Date()).valueOf();
 
   if(wallet_rec.Item) {
-    throw new Error('This wallet has already requested seed funds. Please wait a few minutes until they are');
+    throw new Error('This wallet has already requested seed funds.');
 
   } else {
     return doc_client.put({
