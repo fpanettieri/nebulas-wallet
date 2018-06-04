@@ -1,0 +1,100 @@
+body {
+  font-family: "Work Sans", sans-serif;
+  overflow: hidden; }
+
+.cta-btn {
+  height: 5rem;
+  padding: 0 2rem;
+  border-radius: 2.5rem;
+  transition: all .1s ease-out; }
+  .cta-btn:hover {
+    background-color: #41337A;
+    transform: scale(1.1); }
+  .cta-btn:active {
+    background-color: #B8B8D1;
+    transform: scale(0.95);
+    transition-duration: .05s; }
+
+section.space {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  min-height: 100vh;
+  z-index: -1;
+  background-color: #191248;
+  background: radial-gradient(ellipse at bottom, #191248 0%, #010204 100%); }
+  section.space canvas {
+    width: 100%;
+    height: 100%; }
+
+section.hero {
+  margin-bottom: 10vh; }
+  section.hero .hero-logo {
+    margin-bottom: 3rem; }
+  section.hero .title {
+    color: #FFFFFF;
+    font-family: "Work Sans", sans-serif;
+    font-weight: 200; }
+  section.hero .subtitle {
+    color: #FFFFFF;
+    font-size: 1.15rem;
+    font-weight: 200; }
+
+section.features {
+  position: relative;
+  padding: 5vh 0; }
+  section.features .features-bg {
+    background-color: #FFFFFF;
+    transform: rotate(-5deg) scaleX(1.3); }
+  section.features h1.title {
+    color: #41337A;
+    font-family: "Roboto", sans-serif;
+    font-weight: 200;
+    margin-bottom: 2rem; }
+  section.features .icon {
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-radius: 50%;
+    background-color: #41337A;
+    color: #FFFFFF; }
+  section.features .box {
+    transition: all .2s ease-out; }
+    section.features .box:hover {
+      transform: scale(1.05) translateY(8px);
+      background-color: #41337A;
+      color: #FFFFFF; }
+      section.features .box:hover h1.title {
+        color: #FFFFFF; }
+      section.features .box:hover .icon {
+        background-color: #FFFFFF;
+        color: #41337A; }
+
+section.cta {
+  padding: 5vh 0; }
+  section.cta .title {
+    color: #FFFFFF;
+    font-family: "Work Sans", sans-serif;
+    font-weight: 200;
+    margin-bottom: 3rem; }
+  section.cta .github {
+    display: flex;
+    align-items: center;
+    color: #E6E8E6 !important; }
+    section.cta .github .source {
+      margin-left: 1rem;
+      font-family: "Roboto", sans-serif; }
+
+@media (max-width: 576px) {
+  html {
+    font-size: 11px; } }
+
+@media (max-width: 768px) {
+  .hero-logo {
+    width: 45vw; } }
+
+@media (min-width: 769px) {
+  .hero-logo {
+    width: 20vw; }
+  section.features, section.cta {
+    padding: 15vh 0; } }

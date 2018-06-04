@@ -24,8 +24,18 @@ body {
   height: 5rem;
   padding: 0 2rem;
   border-radius: 2.5rem;
-  &:hover { background-color: $palette-3; }
-  &:active { background-color: $palette-5; }
+  transition: all .1s ease-out;
+
+  &:hover {
+    background-color: $palette-3;
+    transform: scale(1.1);
+  }
+
+  &:active {
+    background-color: $palette-5;
+    transform: scale(0.95);
+    transition-duration: .05s;
+  }
 }
 
 section.space {

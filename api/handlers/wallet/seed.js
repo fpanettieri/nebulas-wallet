@@ -3,8 +3,8 @@
 const aws = require('aws-sdk');
 const doc_client = new aws.DynamoDB.DocumentClient();
 
-const THROTTLE_IP = 3 * 60 * 1000;
-const THROTTLE_EMAIL = 10 * 60 * 1000;
+const THROTTLE_IP = 1 * 60 * 1000;
+const THROTTLE_EMAIL = 5 * 60 * 1000;
 
 function getIp (ip) {
   return doc_client.get({ TableName: 'nas-ips', Key: { ip: ip } }).promise();
@@ -24,7 +24,7 @@ function throttleIp (ip_rec, ip) {
   if(ip_rec.Item) {
     let last_access = ip_rec.Item.last_access;
     if ((now - last_access) < THROTTLE_IP) {
-      throw new Error('This ip has requested funds recently. Wait a few minutes before trying again.');
+      throw new Error('This ip has requested funds recently. Wait a few seconds before trying again.');
     }
 
     return doc_client.update({

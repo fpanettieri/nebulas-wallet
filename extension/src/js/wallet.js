@@ -5,7 +5,7 @@
   const TESTNET_URL = 'https://testnet.nebulas.io';
   const EXPLORER_URL = 'https://explorer.nebulas.io/#/';
   const MARKET_URL = 'https://api.coinmarketcap.com/v2/ticker/1908/';
-  const SEED_URL = 'https://seed.nebulaswallet.app/';
+  const SEED_URL = 'https://api.nebulaswallet.app/seed';
 
   const NETWORK_MAINNET = 'mainnet';
   const NETWORK_TESTNET = 'testnet';
@@ -433,6 +433,19 @@
     let $settings = $('.settings.view');
     let $network = $settings.find('.network-btn');
 
+    function onSeedSuccess (status, xhr) {
+      notify('Seeding Wallet', 'You will receive your seed funds on the next minted block!')
+    }
+
+    function onSeedError (status, xhr) {
+      try {
+        let resp = JSON.parse(xhr.responseText);
+        notify('Seed Error', resp.errorMessage);
+      } catch(err) {
+        notify('Seed Error', err);
+      }
+    }
+
     function onSeed () {
       chrome.permissions.request({ permissions: ['identity', 'identity.email'] }, (allowed) => {
         if (!allowed) {
@@ -440,10 +453,10 @@
         }
         chrome.identity.getProfileUserInfo((info) => {
           if (info && info.email && info.id) {
-            xhr(SEED_URL + '?e=' + info.email + '&i=' + info.id, noop, noop);
+            notify('Seeding Wallet', 'Please Wait ...');
+            xhr(SEED_URL + '?e=' + info.email + '&a=' + account.getAddressString(), onSeedSuccess, onSeedError);
           }
         });
-        return notify('Seeding Wallet', 'You will receive your seed funds on the next minted block!');
       });
     }
 
