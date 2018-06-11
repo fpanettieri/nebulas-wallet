@@ -1,0 +1,34 @@
+##### V1.0 #####
+
+# Wallet address
+n1G1DyE3PDkwnhEt442GCodvu282t1fPuJe
+
+# Contract address
+n1qZboGZVyjanmbMPTBfBPBSjktiSYmPM81
+
+# Creation Tx
+http://localhost:8080/check.html?043c2156d41436e8b135292023fa5b3d72c2c694c85b6dd2fda23f76d71d15c2
+
+# Initial Balance
+curl -i -H Accept:application/json -X POST http://localhost:8685/v1/user/accountstate -d '{"address":"n1qZboGZVyjanmbMPTBfBPBSjktiSYmPM81"}'
+{"result":{"balance":"0","nonce":"0","type":88}}
+
+# Deposit tx
+http://localhost:8080/check.html?c7c1a6e62545541cdf8408dfd7d0b304895452bc2ebbd07f124930590408b948
+
+# Contract Balance
+curl -i -H Accept:application/json -X POST http://localhost:8685/v1/user/accountstate -d '{"address":"n1qZboGZVyjanmbMPTBfBPBSjktiSYmPM81"}'
+{"result":{"balance":"3000000000000000000","nonce":"0","type":88}}
+
+# New Wallet
+n1Sx3BegQphHz4gW6HdBooNFX3M5hgkiUni
+
+# Pre Seed Balance
+curl -i -H Accept:application/json -X POST http://localhost:8685/v1/user/accountstate -d '{"address":"n1Sx3BegQphHz4gW6HdBooNFX3M5hgkiUni"}'
+{"result":{"balance":"0","nonce":"0","type":87}}
+
+# Seed tx
+http://localhost:8080/check.html?50903eb603cb251cba9304de4a30de477d0a45e39cbc2f318d130bb264a1a552
+
+# Post Seed Balance
+curl -i -H Accept:application/json -X POST http://localhost:8685/v1/user/accountstate -d '{"address":"n1Sx3BegQphHz4gW6HdBooNFX3M5hgkiUni"}'
