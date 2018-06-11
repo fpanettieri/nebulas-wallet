@@ -46,6 +46,9 @@ NebulasWallet.prototype = {
     if (!Blockchain.verifyAddress(addr)) {
       throw new Error('Invalid wallet address');
     }
+    if (!!this.wallets.get(addr)) {
+      throw new Error('Wallet already seeded');
+    }
 
     let reminder = this.balance.minus(this.seed);
     if (reminder.lte(ZERO)) {
