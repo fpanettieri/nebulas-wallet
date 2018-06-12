@@ -13,11 +13,11 @@ ditto src/img dist/img
 
 # css
 mkdir -p dist/css
-node-sass src/css/style.scss src/css/style.css
+node-sass src/css/style.scss src/css/style.css &> /dev/null
 cleancss -o dist/css/style.min.css src/css/style.css
 
 # js
 mkdir -p dist/js
-cp -rf src/js/*.min.js dist/js/
+cp -f src/js/*.min.js dist/js/
 uglifyjs src/js/stars.js -c -m -o dist/js/stars.min.js
 uglifyjs src/js/util.js -c -m -o dist/js/util.min.js

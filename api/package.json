@@ -6,6 +6,7 @@
   "private": true,
   "dependencies": {
     "aws-sdk": "^2.250.1",
-    "claudia-api-builder": "^4.0.2"
+    "claudia-api-builder": "^4.0.2",
+    "nebulas": "^0.5.0"
   }
 }

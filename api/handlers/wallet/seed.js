@@ -1,10 +1,18 @@
 'use strict';
 
 const aws = require('aws-sdk');
+const s3 = new aws.S3();
 const doc_client = new aws.DynamoDB.DocumentClient();
+
+const Nebulas = require('nebulas');
+const Account = Nebulas.Account;
+const Neb = new Nebulas.Neb();
 
 const THROTTLE_IP = 1 * 60 * 1000;
 const THROTTLE_EMAIL = 5 * 60 * 1000;
+const NONCE_RADIX = 10;
+const GAS_PRICE = 1000000;
+const GAS_LIMIT = 2000000;
 
 function getIp (ip) {
   return doc_client.get({ TableName: 'nas-ips', Key: { ip: ip } }).promise();
@@ -70,6 +78,41 @@ function throttleEmail (email_rec, email) {
   }
 }
 
+function fetchAccount (s3_bkt, s3_obj) {
+  return s3.getObject({ Bucket: s3_bkt, Key: s3_obj }).promise();
+}
+
+function callContract (s3_res, nas_pass, nas_contract, nas_network, address) {
+  Neb.setRequest(new Nebulas.HttpRequest(nas_network));
+
+  let account = new Account();
+  account.fromKey(s3_res.Body.toString(), nas_pass);
+
+  let neb_state = null;
+  return Neb.api.getNebState().then((state) => {
+    neb_state = state;
+    return Neb.api.getAccountState(account.getAddressString());
+  }).then((acc_state) => {
+    let nonce = parseInt(acc_state.nonce, NONCE_RADIX);
+
+    let tx = new Nebulas.Transaction({
+      chainID: neb_state.chain_id,
+      from: account,
+      to: nas_contract,
+      value: 0,
+      nonce: (nonce + 1),
+      gasPrice: GAS_PRICE,
+      gasLimit: GAS_LIMIT,
+      contract: {
+        function: 'seedWallet',
+        args: '["' + address + '"]'
+      }
+    });
+    tx.signTransaction();
+    return Neb.api.sendRawTransaction({ data: tx.toProtoString() });
+  });
+}
+
 function seedWallet (wallet_rec, address, email) {
   let now = (new Date()).valueOf();
 
@@ -79,12 +122,12 @@ function seedWallet (wallet_rec, address, email) {
   } else {
     return doc_client.put({
       TableName: 'nas-wallets',
-      Item: { address: address, email: email,  status: 'pending', last_access: now }
+      Item: { address: address, email: email, last_access: now }
     }).promise();
   }
 }
 
-function wallet_seed (email, address, ip) {
+function wallet_seed (email, address, ip, s3_bkt, s3_obj, nas_pass, nas_contract, nas_network) {
   if (!email || !address) { throw new Error('Email and address are required to seed.'); }
 
   return getIp(ip)
@@ -92,7 +135,9 @@ function wallet_seed (email, address, ip) {
     .then(() => getEmail(email))
     .then(email_rec => throttleEmail(email_rec, email))
     .then(() => getWallet(address))
-    .then(wallet_rec => seedWallet(wallet_rec, address, email));
+    .then(wallet_rec => seedWallet(wallet_rec, address, email))
+    .then(() => fetchAccount(s3_bkt, s3_obj))
+    .then(s3_res => callContract(s3_res, nas_pass, nas_contract, nas_network, address));
 }
 
 module.exports = wallet_seed;

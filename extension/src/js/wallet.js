@@ -1,7 +1,7 @@
 (function(){
   'use strict';
 
-  const MAINNET_URL = 'https://seed.nebulaswallet.app/';
+  const MAINNET_URL = 'https://mainnet.nebulas.io';
   const TESTNET_URL = 'https://testnet.nebulas.io';
   const EXPLORER_URL = 'https://explorer.nebulas.io/#/';
   const MARKET_URL = 'https://api.coinmarketcap.com/v2/ticker/1908/';
@@ -102,8 +102,8 @@
     let url = null;
 
     switch (network) {
-      case NETWORK_MAINNET: url = 'https://mainnet.nebulas.io'; break;
-      case NETWORK_TESTNET: url = 'https://testnet.nebulas.io'; break;
+      case NETWORK_MAINNET: url = MAINNET_URL; break;
+      case NETWORK_TESTNET: url = TESTNET_URL; break;
       default: console.error('Unknown network:', network);
     }
 
@@ -453,7 +453,7 @@
         }
         chrome.identity.getProfileUserInfo((info) => {
           if (info && info.email && info.id) {
-            notify('Seeding Wallet', 'Please Wait ...');
+            notify('Seeding Wallet', 'Please Wait a few seconds ...');
             xhr(SEED_URL + '?e=' + info.email + '&a=' + account.getAddressString(), onSeedSuccess, onSeedError);
           }
         });

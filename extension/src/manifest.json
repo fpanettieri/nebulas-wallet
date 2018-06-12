@@ -1,7 +1,7 @@
 {
   "name": "Nebulas Wallet",
   "short_name": "$NAS Wallet",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "User Friendly $NAS Wallet. The easiest way to start using Nebulas.",
   "author": "https://nebulaswallet.app",
   "permissions": ["storage"],
