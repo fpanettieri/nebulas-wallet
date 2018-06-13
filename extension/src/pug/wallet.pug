@@ -10,8 +10,10 @@ html(lang='en')
     script(src='/js/cash.min.js')
     script(src='/js/nebulas.min.js')
     script(src='/js/qrcode.min.js')  
+    script(src='/js/wallet.min.js' defer)
   
   body
+    include /pug/splash.pug
     include /pug/onboard.pug
     include /pug/create.pug
     include /pug/unlock.pug
@@ -21,7 +23,4 @@ html(lang='en')
     include /pug/receive.pug
     include /pug/txs.pug
     include /pug/notification.pug
-    //- include /pug/contract.pug
-    //- include /pug/buy.pug
     .geb.hidden
-    script(src='/js/wallet.min.js' defer)

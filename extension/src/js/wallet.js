@@ -34,7 +34,7 @@
 
   // $refs
   let $body = $('body');
-  let $view = null;
+  let $view = $('.splash.view');
 
   // Persistence
   let theme = 'light';

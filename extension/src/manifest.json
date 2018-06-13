@@ -7,11 +7,6 @@
   "permissions": ["storage"],
   "optional_permissions": ["identity", "identity.email", "downloads"],
 
-  "background": {
-    "scripts": ["js/background.min.js"],
-    "persistent": true
-  },
-
   "browser_action": {
     "default_title": "Nebulas Wallet",
     "default_popup": "html/wallet.html"
