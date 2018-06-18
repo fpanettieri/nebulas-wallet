@@ -17,7 +17,7 @@ However the first steps for end users can be a little daunting.
 This project aims to help both worlds: Kick start new developers, allowing them to upload dApps faster, while helping new users start using nebulas dApps with 2 clicks.
 
 ## Seed funds
-The first 1.000.000 users of the Nebulas Wallet will receive 100 Gwei (0.0000001 NAS). This should be enough to deploy a fairly complex smart contract on the mainnet, or call a few dApp methods. Funds are distributed on request to new wallets on the next minted block.
+The first 1.000.000 users of the Nebulas Wallet will receive 1000 Gwei (0.000001 NAS). This should be enough to deploy a fairly complex smart contract on the mainnet, or call a few dApp methods. Funds are distributed on request to new wallets on the next minted block.
 
 ## Libraries
 
