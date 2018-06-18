@@ -32,3 +32,6 @@ http://localhost:8080/check.html?50903eb603cb251cba9304de4a30de477d0a45e39cbc2f3
 
 # Post Seed Balance
 curl -i -H Accept:application/json -X POST http://localhost:8685/v1/user/accountstate -d '{"address":"n1Sx3BegQphHz4gW6HdBooNFX3M5hgkiUni"}'
+
+# Beep Boop
+n21q8R2nqQyiueLVNcELeg5HXR6uPo3ekWm

@@ -9,7 +9,6 @@
 
   const NETWORK_MAINNET = 'mainnet';
   const NETWORK_TESTNET = 'testnet';
-  const NETWORK_LOCALNET = 'localnet';
 
   const HTTP_STATUS_OK = 200;
   const HTTP_STATUS_ERROR = 400;
@@ -26,6 +25,7 @@
   const TX_STATUS_PENDING = 2;
   const UPDATE_INTERVAL = 5000;
   const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'June', 'July', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec'];
+  const FIXED_SIZE = 10;
 
   const Nebulas = require('nebulas');
   const Account = Nebulas.Account;
@@ -40,6 +40,7 @@
   let theme = 'light';
   let account = null;
   let nonce = 0;
+  let unapproved = [];
   let pending = [];
   let txs = {};
 
@@ -68,12 +69,12 @@
     if ($view) { $view.addClass('hidden'); }
     $view = $('.view.' + v);
     $view.removeClass('hidden');
+    geb_trigger('view:' + v);
   }
 
   function checkChromeError () {
-    if (chrome.runtime.lastError) {
-      notify('Chrome Runtime Error', chrome.runtime.lastError);
-    }
+    if (!chrome.runtime.lastError) { return; }
+    notify('Chrome Runtime Error', chrome.runtime.lastError);
   }
 
   function notify (title, msg) {
@@ -159,9 +160,9 @@
 
       account = Account.NewAccount();
       chrome.storage.local.set({account: account.toKey(pass), account_str: account.toKeyString(pass)});
-
       geb_trigger('account:ready');
-      switchView('account');
+
+      switchView(unapproved.length > 0 ? 'nebpay' : 'account');
     }
 
     $create.find('.cancel-btn').on('click', () => switchView('onboard'));
@@ -183,7 +184,8 @@
           account = new Account();
           account.fromKey(result.account, pass);
           geb_trigger('account:ready');
-          switchView('account');
+
+          switchView(unapproved.length > 0 ? 'nebpay' : 'account');
         } catch (err) {
           notify('Unlock Failed', err);
         }
@@ -199,25 +201,33 @@
     let $nas = $account.find('.account-balance-nas');
     let $usd = $account.find('.account-balance-usd');
 
-    function onReady() {
+    function onReady () {
       Neb.api.getAccountState(account.getAddressString()).then((state) => {
         acc_state = state;
         nonce = parseInt(acc_state.nonce, NONCE_RADIX);
         chrome.storage.local.set({nonce: nonce});
         geb_trigger('account:balance');
+
+        chrome.runtime.sendMessage({
+          logo: 'nebulas',
+          src: 'wallet',
+          type: 'account',
+          state: state,
+          addr: account.getAddressString()
+        });
       });
     }
 
     function onBalance() {
       if (!acc_state) { return; }
       let nas = Nebulas.Unit.fromBasic(acc_state.balance);
-      $nas.text(nas + ' NAS');
+      $nas.text(nas.toFixed(FIXED_SIZE) + ' NAS');
       $usd.text('');
 
       if (!market) { return; }
       let price = market['data']['quotes']['USD']['price'];
       let usd = nas.times(price);
-      $usd.text(usd + ' USD');
+      $usd.text(usd.toFixed(FIXED_SIZE) + ' USD');
     }
 
     $account.find('.settings-btn').on('click', () => switchView('settings'));
@@ -239,7 +249,6 @@
       let to = $to.val().trim();
       let amount = $amount.val().trim();
       let wei = 0;
-      let balance = 0;
       let tx = null;
 
       if (!account || !acc_state) { return notify('Please Wait', 'Your account information has not been loaded yet.'); }
@@ -266,16 +275,18 @@
       });
       tx.signTransaction();
 
+      notify('Sending Tx', 'Please wait ...');
+      switchView('account');
+
       Neb.api.sendRawTransaction({ data: tx.toProtoString() }).then((r) => {
         $to.val('');
         $amount.val('');
 
-        pending.push(r.txhash);
+        pending.push({ tx: tx.toPlainObject(), hash: r.txhash });
         chrome.storage.local.set({nonce: ++nonce, pending: pending});
         geb_trigger('txs:pending');
 
         notify('Success', 'Transaction sent! You can check the progress from the transactions list.');
-        switchView('account');
       }).catch((err) => {
         return notify('Raw Tx Error', err);
       });
@@ -292,7 +303,7 @@
     let $address = $receive.find('.receive-address');
     let $qr = $receive.find('.receive-qr');
 
-    function onReady() {
+    function onReady () {
       let addr = account.getAddressString();
       $address.val(addr);
       QRCode.toCanvas($qr[0], addr, {
@@ -330,19 +341,19 @@
     }
 
     function txType (tx) {
-      if (tx.contract_address !== '') { return 'contract'; }
+      if (tx.contract) { return 'contract'; }
       else if (tx.from === addr ) { return 'sent'; }
       else if (tx.to === addr ) { return 'received'; }
       else { return 'unknown'; }
     }
 
-    function txDate (tx) {
-      let d = new Date(tx.timestamp * 1000);
+    function receiptDate (receipt) {
+      let d = new Date(receipt.timestamp * 1000);
       return MONTHS[d.getMonth()] + ' ' + d.getDate() + ', ' + zpad(d.getHours()) + ':' + zpad(d.getMinutes()) + ':' + zpad(d.getSeconds());
     }
 
-    function txStatus (tx) {
-      switch (tx.status) {
+    function receiptStatus (receipt) {
+      switch (receipt.status) {
         case TX_STATUS_FAILED: return 'failed';
         case TX_STATUS_SUCCESS: return 'success';
         case TX_STATUS_PENDING: return 'pending';
@@ -353,20 +364,23 @@
     function renderTxs () {
       $list.empty();
 
-      Object.keys(txs).forEach((hash) => {
-        let tx = txs[hash];
+      Object.keys(txs).forEach((t) => {
+        let tx = txs[t].tx;
+        let receipt = txs[t].receipt;
+
         let type = txType(tx);
-        let date = txDate(tx);
-        let status = txStatus(tx);
-        let amount = Nebulas.Unit.fromBasic(tx.value);
+        let name = tx.contract ? tx.contract.function : type;
+        let date = receiptDate(receipt);
+        let status = receiptStatus(receipt);
+        let amount = Nebulas.Unit.fromBasic(receipt.value);
 
         let $tx = $tpl.clone();
         $tx.addClass('tx-' + type);
-        $tx.find('.tx-type').text(type);
+        $tx.find('.tx-name').text(name);
         $tx.find('.tx-amount').text(amount + ' NAS');
         $tx.find('.tx-date').text(date);
         $tx.find('.tx-status').text(status);
-        $tx.data('hash', tx.hash);
+        $tx.data('hash', receipt.hash);
         $list.prepend($tx);
       });
     }
@@ -383,17 +397,26 @@
       let missing = pending.length;
 
       for (let i = 0; i < pending.length; i++) {
-        let hash = pending[i];
+        let tx = pending[i].tx
+        let hash = pending[i].hash;
+        let req = pending[i].req;
 
         Neb.api.getTransactionReceipt({ hash: hash }).then((receipt) => {
-          txs[receipt.timestamp] = receipt;
-          if (receipt.status != TX_STATUS_PENDING) {
-            pending = pending.filter(t => t !== hash);
-          }
+          txs[receipt.timestamp] = {tx: tx, hash: hash, receipt: receipt};
+
+          if (receipt.status === TX_STATUS_PENDING) { return; }
+          pending = pending.filter(t => t.hash !== hash);
+
+          if (!req) { return; }
+          req.res = { result: receipt.execute_result, execute_err: receipt.execute_error, estimate_gas: receipt.gas_used };
+          req.status = receiptStatus(receipt);
+          chrome.runtime.sendMessage(req);
+
         }).catch((err) => {
-          pending = pending.filter(t => t !== hash);
+          pending = pending.filter(t => t.hash !== hash);
           notify('Tx Receipt Error', err);
           console.error(err, hash);
+
         }).then(() => {
           if (--missing === 0) {
             chrome.storage.local.set({txs: txs, pending: pending});
@@ -508,6 +531,149 @@
     showNetwork();
   }
 
+  { // NebPay
+    let $nebpay = $('.nebpay.view');
+    let $brand = $nebpay.find('.brand-name');
+    let $call_fn = $nebpay.find('.nebpay-call-fn');
+    let $call_args = $nebpay.find('.nebpay-call-args');
+    let $to = $nebpay.find('.nebpay-detail.to input');
+    let $amount = $nebpay.find('.nebpay-detail.amount input');
+    let $fn = $nebpay.find('.nebpay-detail.fn input');
+    let $args = $nebpay.find('.nebpay-detail.args input');
+    let $gas_limit = $nebpay.find('.nebpay-detail.gas-limit input');
+    let $gas_price = $nebpay.find('.nebpay-detail.gas-price input');
+
+    let height = $body.height();
+    let detailed = false;
+
+    function onShow () {
+      let req = unapproved[0];
+      $brand.text(req.dapp);
+      $call_fn.text(req.params.pay.payload.function);
+      $call_args.text(req.params.pay.payload.args || '[ ]');
+      $to.val(req.params.pay.to);
+      $amount.val(req.params.pay.value);
+      $fn.val(req.params.pay.payload.function);
+      $args.val(req.params.pay.payload.args);
+      $gas_limit.val(gas.limit);
+      $gas_price.val(gas.price);
+    }
+
+    function onDetails () {
+      window.resizeBy(0, detailed ? -height : height);
+      window.moveBy(0, detailed ? (height / 2) : -(height / 2));
+      detailed = !detailed;
+
+      $nebpay.toggleClass('short-view');
+      $nebpay.toggleClass('medium-view');
+    }
+
+    function onCancel () {
+      let req = unapproved.shift();
+      chrome.storage.local.set({unapproved: unapproved});
+      req.src = 'wallet';
+      req.status = 'rejected';
+      chrome.runtime.sendMessage(req);
+      if (detailed) {
+        window.resizeBy(0, -height);
+        window.moveBy(0, (height / 2));
+      }
+      switchView('account');
+    }
+
+    function onConfirm () {
+      let to = $to.val().trim();
+      let amount = $amount.val().trim();
+      let fn = $fn.val().trim();
+      let args = $args.val().trim();
+      let gas_limit = $gas_limit.val().trim();
+      let gas_price = $gas_price.val().trim();
+      let req = unapproved[0];
+      let type = 'unknown';
+      let wei = 0;
+      let tx = null;
+      let txData = null;
+
+      if (!account || !acc_state) { return notify('Please Wait', 'Your account information has not been loaded yet.'); }
+      if (!neb_state) { return notify('Please Wait', 'The network information has not been loaded yet.'); }
+      if (!Account.isValidAddress(to)) { return notify('Invalid Address', 'Your destination address should start with an \'n\', followed by 34 characters. Please enter a valid address.'); }
+      if (!fn) { return notify('Invalid Function', 'The function name can\'t be empty.'); }
+
+      try {
+        wei = Nebulas.Unit.nasToBasic(amount);
+      } catch (err) {
+        return notify('Invalid Amount', 'The transfer amount must be a number.');
+      }
+
+      if (wei < 0) { return notify('Invalid Amount', 'The amount sent must be >= 0. Please enter a valid number.'); }
+      if (wei.gt(acc_state.balance)) { return notify('Insufficient Funds', 'The amount you are trying to send is more than your current balance.'); }
+
+      try {
+        type = req.params.pay.payload.type;
+
+        txData = {
+          chainID: neb_state.chain_id,
+          from: account,
+          to: to,
+          value: wei,
+          nonce: (nonce + 1),
+          gasPrice: gas_price,
+          gasLimit: gas_limit,
+          serialNumber: req.params.serialNumber,
+          callback: req.params.callback
+        }
+
+        switch (type) {
+          case 'deploy': {
+            txData.contract = {
+              source: req.params.pay.payload.source,
+              sourceType: req.params.pay.payload.sourceType,
+              args: args
+            };
+          } break;
+
+          case 'call': {
+            txData.contract = { function: fn, args: args };
+          } break;
+
+          default: {
+            return notify('Invalid Tx Type', 'The transaction you are trying to send has an invalid type: ' + type);
+          }
+        }
+      } catch (err) {
+        return notify('Tx Error', err);
+      }
+
+      tx = new Nebulas.Transaction(txData);
+      tx.signTransaction();
+
+      if (detailed) { onDetails(); }
+      notify('Sending Tx', 'Please wait ...');
+      switchView('account');
+
+      Neb.api.sendRawTransaction({ data: tx.toProtoString() }).then((r) => {
+        let req = unapproved.shift();
+        req.src = 'wallet';
+        req.status = 'submitted';
+        chrome.runtime.sendMessage(req);
+
+        pending.push({ tx: tx.toPlainObject(), hash: r.txhash, req: req });
+        chrome.storage.local.set({nonce: ++nonce, pending: pending, unapproved: unapproved});
+        geb_trigger('txs:pending');
+
+        notify('Success', 'Transaction sent! You can check the progress from the transactions list.');
+      }).catch((err) => {
+        return notify('Raw Tx Error', err);
+      });
+    }
+
+    $nebpay.find('.nebpay-call').on('click', onDetails);
+    $nebpay.find('.cancel-btn').on('click', onCancel);
+    $nebpay.find('.confirm-btn').on('click', onConfirm);
+
+    geb_on('view:nebpay', onShow);
+  }
+
   { // Initialization
     updateNetwork();
 
@@ -515,6 +681,7 @@
       theme: 'light',
       account: null,
       nonce: 0,
+      unapproved: [],
       pending: [],
       txs: {}
     }
@@ -523,6 +690,7 @@
       checkChromeError();
 
       nonce = result.nonce;
+      unapproved = result.unapproved;
       pending = result.pending;
       txs = result.txs;
       theme = result.theme;

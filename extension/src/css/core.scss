@@ -29,6 +29,11 @@ input[type="password"], input[type="text"], input[type="number"] {
   height: 13.6rem;
 }
 
+.medium-view {
+  width: 22rem;
+  height: 27.2rem;
+}
+
 .long-view {
   width: 22rem;
   height: 35.6rem;
@@ -120,6 +125,10 @@ input[type="password"], input[type="text"], input[type="number"] {
   padding-left: 2rem;
   background-repeat: no-repeat;
   background-size: contain;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 24ch;
+  white-space: nowrap;
 
   &.lg {
     font-size: 2rem;
@@ -215,7 +224,7 @@ input[type="password"], input[type="text"], input[type="number"] {
     font-size: 0.7rem;
   }
 
-  .tx-type {
+  .tx-name {
     text-transform: capitalize;
   }
 }
@@ -229,5 +238,54 @@ input[type="password"], input[type="text"], input[type="number"] {
     font-size: 1rem;
     font-weight: $font-extra-light;
     text-align: center;
+  }
+}
+
+.nebpay {
+  .nebpay-call {
+    border-radius: .5rem;
+    cursor: pointer;
+    font-weight: 300;
+    padding: 1rem 0;
+    text-align: center;
+    width: 100%;
+  }
+
+  .nebpay-call-fn {
+    font-size: 1.3rem;
+    margin-bottom: .5rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .nebpay-call-args {
+    font-size: .7rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .nebpay-details {
+    width: 100%;
+    transition: all .2s ease-out;
+    overflow: hidden;
+  }
+
+  &.short-view .nebpay-details { display: none; }
+  &.medium-view .nebpay-details { display: block; }
+
+  .nebpay-detail {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.5rem;
+
+    span {
+      margin-right: .5rem;
+      white-space: nowrap;
+      font-size: .7rem;
+      font-weight: $font-light;
+      text-align: right;
+      width: 10ch;
+    }
   }
 }

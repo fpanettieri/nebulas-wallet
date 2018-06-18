@@ -19,7 +19,7 @@ body {
   }
 
   .brand-name { background-image: url(/img/logo-dark.svg); }
-  .account-balance:hover { background-color: $light-2; }
+  .account-balance:hover, .nebpay-call:hover { background-color: $light-2; }
 
   .txs {
     .tx {
@@ -55,7 +55,7 @@ body.dark {
   }
 
   .brand-name { background-image: url(/img/logo-light.svg); }
-  .account-balance:hover { background-color: $palette-3; }
+  .account-balance:hover, .nebpay-call:hover { background-color: $palette-3; }
 
   .txs {
     .tx {
