@@ -66,7 +66,7 @@
     });
   }
 
-  function onMessage (req, sender) {
+  function onMessage (req, sender, sendResponse) {
     if (req.logo !== 'nebulas') { return; }
 
     if (req.src === 'nebPay') {
@@ -77,20 +77,28 @@
       }
 
       let type = req.params.pay.payload.type;
-      if (type === 'call') {
-        onCallMsg(req, sender);
-      } else if (type === 'simulateCall') {
-        onSimulateMsg(req, sender);
-      } else {
-        throw 'unknown msg type: ' + type;
+      switch(type) {
+        case 'binary':
+        case 'call': {
+          onCallMsg(req, sender);
+        } break;
+
+        case 'simulateCall': {
+          onSimulateMsg(req, sender);
+        } break;
+
+        default: {
+          throw 'unknown msg type: ' + type;
+        }
       }
     }
 
     if (req.src === 'wallet') {
-      if (req.type === 'account') {
+      if (req.type === 'cache') {
+        onCheckCache(req, sendResponse);
+      } else if (req.type === 'account') {
         onAccount(req);
       } else {
-        // TODO: ???
         onWalletMsg(req);
       }
     }
@@ -103,7 +111,6 @@
     if (!req.params.pay) { throw  'missing pay'; }
     if (!req.params.pay.payload) { throw 'missing serialNumber'; }
     if (!req.params.pay.payload.type) { throw 'missing payload.type'; }
-    if (!req.params.pay.payload.function) { throw 'missing payload.function'; }
     return true;
   }
 
@@ -125,18 +132,21 @@
   }
 
   function onAccount (req) {
-    account = {
-      addr: req.addr,
-      state: req.state
-    }
+    account = new Nebulas.Account(req.pk);
+    nonce = req.state.nonce;
     simulateCalls();
+  }
+
+  function onCheckCache (req, sendResponse) {
+    if (!account) { return; }
+    sendResponse(account.getPrivateKeyString());
   }
 
   function simulateCalls () {
     for (let i = 0; i < simulated.length; i++) {
       let req = simulated[i];
       Neb.api.call({
-        from: account.addr,
+        from: account.getAddressString(),
         to: req.params.pay.to,
         value: req.params.pay.value,
         nonce: ++nonce,

@@ -113,6 +113,14 @@
     Neb.api.gasPrice().then(r => { gas.price = r.gas_price });
   }
 
+  function getBgCache (cb) {
+    chrome.runtime.sendMessage({
+      logo: 'nebulas',
+      src: 'wallet',
+      type: 'cache'
+    }, cb);
+  }
+
   // Events
   let _geb = {};
 
@@ -213,7 +221,7 @@
           src: 'wallet',
           type: 'account',
           state: state,
-          addr: account.getAddressString()
+          pk: account.getPrivateKeyString()
         });
       });
     }
@@ -261,7 +269,7 @@
         return notify('Invalid Amount', 'The transfer amount must be a number.');
       }
 
-      if (wei <= 0) { return notify('Invalid Amount', 'The amount sent must be > 0. Please enter a valid number.'); }
+      if (wei < 0) { return notify('Invalid Amount', 'The amount sent must be >= 0. Please enter a valid number.'); }
       if (wei.gt(acc_state.balance)) { return notify('Insufficient Funds', 'The amount you are trying to send is more than your current balance.'); }
 
       tx = new Nebulas.Transaction({
@@ -287,6 +295,7 @@
         geb_trigger('txs:pending');
 
         notify('Success', 'Transaction sent! You can check the progress from the transactions list.');
+        switchView('txs');
       }).catch((err) => {
         return notify('Raw Tx Error', err);
       });
@@ -329,6 +338,9 @@
     let $list = $txs.find('.txs-list');
     let $tpl = $list.find('.tx.template').remove().removeClass('template');
     let addr = null;
+
+    let $notification = $('.notification.view');
+    let height = $body.height() * 1.6;
 
     function zpad (t) {
       return t < 10 ? ('0' + t) : t;
@@ -426,11 +438,27 @@
       }
     }
 
-    $txs.find('.cancel-btn').on('click', () => switchView('account'));
+    function onShow () {
+      $notification.removeClass('short-view');
+      $notification.addClass('long-view');
+      window.resizeBy(0, height);
+      window.moveBy(0, -(height / 2));
+    }
+
+    function onClose () {
+      $notification.addClass('short-view');
+      $notification.removeClass('long-view');
+      window.resizeBy(0, -height);
+      window.moveBy(0, (height / 2));
+      switchView('account');
+    }
+
+    $txs.find('.cancel-btn').on('click', onClose);
     $list.on('click', '.tx', showTx);
 
     geb_on('account:ready', onReady);
     geb_on('txs:pending', onPending);
+    geb_on('view:txs', onShow);
   }
 
   { // Notification
@@ -536,6 +564,7 @@
     let $brand = $nebpay.find('.brand-name');
     let $call_fn = $nebpay.find('.nebpay-call-fn');
     let $call_args = $nebpay.find('.nebpay-call-args');
+    let $call_amount = $nebpay.find('.nebpay-call-amount');
     let $to = $nebpay.find('.nebpay-detail.to input');
     let $amount = $nebpay.find('.nebpay-detail.amount input');
     let $fn = $nebpay.find('.nebpay-detail.fn input');
@@ -545,16 +574,27 @@
 
     let height = $body.height();
     let detailed = false;
+    let type = null;
 
     function onShow () {
       let req = unapproved[0];
+      type = req.params.pay.payload.type;
+
       $brand.text(req.dapp);
-      $call_fn.text(req.params.pay.payload.function);
-      $call_args.text(req.params.pay.payload.args || '[ ]');
+
+      if (type === 'binary'){
+        $call_fn.text('Payment');
+      } else {
+        $call_fn.text(req.params.pay.payload.function);
+        $call_args.text(req.params.pay.payload.args || '[ ]');
+        $fn.val(req.params.pay.payload.function);
+        $args.val(req.params.pay.payload.args);
+      }
+
+      $call_amount.text('Amount: ' + req.params.pay.value + ' wei');
       $to.val(req.params.pay.to);
       $amount.val(req.params.pay.value);
-      $fn.val(req.params.pay.payload.function);
-      $args.val(req.params.pay.payload.args);
+
       $gas_limit.val(gas.limit);
       $gas_price.val(gas.price);
     }
@@ -589,7 +629,6 @@
       let gas_limit = $gas_limit.val().trim();
       let gas_price = $gas_price.val().trim();
       let req = unapproved[0];
-      let type = 'unknown';
       let wei = 0;
       let tx = null;
       let txData = null;
@@ -597,10 +636,10 @@
       if (!account || !acc_state) { return notify('Please Wait', 'Your account information has not been loaded yet.'); }
       if (!neb_state) { return notify('Please Wait', 'The network information has not been loaded yet.'); }
       if (!Account.isValidAddress(to)) { return notify('Invalid Address', 'Your destination address should start with an \'n\', followed by 34 characters. Please enter a valid address.'); }
-      if (!fn) { return notify('Invalid Function', 'The function name can\'t be empty.'); }
+      if (type !== 'binary' && !fn) { return notify('Invalid Function', 'The function name can\'t be empty.'); }
 
       try {
-        wei = Nebulas.Unit.nasToBasic(amount);
+        wei = Utils.toBigNumber(amount);
       } catch (err) {
         return notify('Invalid Amount', 'The transfer amount must be a number.');
       }
@@ -609,8 +648,6 @@
       if (wei.gt(acc_state.balance)) { return notify('Insufficient Funds', 'The amount you are trying to send is more than your current balance.'); }
 
       try {
-        type = req.params.pay.payload.type;
-
         txData = {
           chainID: neb_state.chain_id,
           from: account,
@@ -624,6 +661,10 @@
         }
 
         switch (type) {
+          case 'binary': {
+            // noop
+          } break;
+
           case 'deploy': {
             txData.contract = {
               source: req.params.pay.payload.source,
@@ -662,6 +703,7 @@
         geb_trigger('txs:pending');
 
         notify('Success', 'Transaction sent! You can check the progress from the transactions list.');
+        switchView('txs');
       }).catch((err) => {
         return notify('Raw Tx Error', err);
       });
@@ -696,7 +738,18 @@
       theme = result.theme;
 
       if (result.theme === 'dark') { $body.addClass('dark'); }
-      switchView(result.account ? 'unlock' : 'onboard');
+
+      getBgCache(cache => {
+        console.log('[WALLET].getBgCache CALLBACK', cache);
+        if (cache) {
+          account = new Nebulas.Account(cache);
+          geb_trigger('account:ready');
+          switchView(unapproved.length > 0 ? 'nebpay' : 'account');
+        } else {
+          account = result.account;
+          switchView(account ? 'unlock' : 'onboard');
+        }
+      })
     });
 
     xhr(MARKET_URL, function (r) {

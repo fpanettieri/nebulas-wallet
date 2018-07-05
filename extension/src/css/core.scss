@@ -265,6 +265,13 @@ input[type="password"], input[type="text"], input[type="number"] {
     white-space: nowrap;
   }
 
+  .nebpay-call-amount {
+    font-size: .7rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
   .nebpay-details {
     width: 100%;
     transition: all .2s ease-out;
